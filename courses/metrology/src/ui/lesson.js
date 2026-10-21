@@ -5,6 +5,7 @@ import { markRead, getLab } from '../core/store.js';
 import { mountExplore } from './explore.js';
 import { workedHtml } from './blocks.js';
 import { countOf } from './problems.js';
+import { PROJECTS } from '../projects/index.js';
 
 function block(b, k) {
   if (b.h) return `<h2>${b.h}</h2>`;
@@ -22,6 +23,7 @@ export function renderLesson(view, id) {
   const i = MODULES.findIndex(m => m.id === id), mod = MODULES[i];
   if (!mod) { location.hash = '#/'; return; }
   markRead(mod.id);
+  const projects = PROJECTS.filter(p => p.module === mod.id);
   const prev = MODULES[i - 1], next = MODULES[i + 1], lab = getLab(`lab-${mod.id}`), n = countOf(mod.lab);
   view.innerHTML = `<p class="crumbs"><a href="#/">Course</a> / Module ${mod.num}</p>
     <h1 class="page-title">${mod.title}</h1>
@@ -31,6 +33,7 @@ export function renderLesson(view, id) {
       ${mod.blocks.map(block).join('')}
       <h2>Lab</h2>
       <div class="cta"><p><b>${n} readings</b> on what this module covered. ${lab ? `${lab.solved.length}/${n} solved so far.` : 'Your progress is saved as you go.'}</p><a class="btn primary" href="#/lab/${mod.id}">${lab?.solved.length ? 'Continue the lab' : 'Start the lab'} →</a></div>
+      ${projects.length ? `<h2>Shop projects</h2><p>Measure a whole part with these tools, like the lab sheets in class.</p><div class="chips">${projects.map(p => `<a class="chip" href="#/project/${p.id}">Project ${p.num}: ${p.title}</a>`).join('')}</div>` : ''}
     </article>
     <nav class="page-nav">${prev ? `<a class="btn" href="#/m/${prev.id}">← ${prev.num}. ${prev.title}</a>` : '<span></span>'}${next ? `<a class="btn" href="#/m/${next.id}">${next.num}. ${next.title} →</a>` : ''}</nav>`;
   view.querySelectorAll('[data-explore]').forEach(el => {
