@@ -20,28 +20,38 @@ export function renderBench(view, filterArg) {
   const saved = getBench() || {};
   const filter = FILTERS.some(f => f.id === filterArg) ? filterArg : saved.filter || 'any';
   let st = { seed: saved.filter === filter && Number.isInteger(saved.seed) ? saved.seed : newSeed(), filter, right: saved.right || 0 };
-  let task, geo, picks, result, flipped, hover, msg, fb, tries, solved, revealed, bench = null, gone = false;
+  let loupeMin = false, task, geo, picks, result, flipped, hover, msg, fb, tries, solved, revealed, bench = null, gone = false;
   const save = () => putBench(st);
+  const wide = matchMedia('(min-width: 861px)');
+  const relayout = () => { if (task) draw(); };
+  wide.addEventListener('change', relayout);
 
-  view.innerHTML = `<p class="crumbs"><a href="#/">Course</a> / 3D measuring bench</p>
-    <div class="lab-head"><h1 class="page-title">3D measuring bench</h1><span class="mod-meta" id="b-score"></span></div>
-    <p class="lede">A random part and the tool to measure it with. Click the part to put the tool on: it snaps to faces and diameters. Then read the scale and type what it says.</p>
-    <div class="chips bench-filters" role="group" aria-label="Tool">${FILTERS.map(f => `<a class="chip${f.id === filter ? ' on' : ''}" href="#/bench/${f.id}">${f.name}</a>`).join('')}</div>
-    <section class="blk blk-problem bench-job" id="b-job"></section>
-    <div class="bench-grid">
-      <div class="bench-stage">
-        <div class="bench-3d" id="b-3d"></div>
-        <div class="bench-tools">
-          <button class="btn sm" data-flip title="Turn the part upside down">⇅ Flip part</button>
-          <button class="btn sm" data-view>⟲ View</button>
-          <button class="btn sm" data-clear>Take tool off</button>
-        </div>
-        <p class="bench-status" id="b-status" role="status"></p>
-        <p class="bench-hint">Drag to turn the view · scroll or pinch to zoom · click a face to put the tool on it</p>
+  // Full screen like the Circuit Analysis workbench: the shop on the left, the job and the answer on the right.
+  document.body.classList.add('bench-open');
+  view.innerHTML = `<div class="bw">
+    <div class="bw-scene">
+      <div class="bw-stage" id="b-3d"></div>
+      <div class="bw-top">
+        <a class="bw-btn" href="#/" title="Back to the course">← Course</a>
+        <div class="bw-title"><small>Metrology lab</small><b>Measuring bench</b></div>
+        <select class="bw-btn" id="b-filter" aria-label="Which tool">${FILTERS.map(f => `<option value="${f.id}"${f.id === filter ? ' selected' : ''}>${f.name}</option>`).join('')}</select>
+        <span class="bw-score" id="b-score"></span>
       </div>
-      <figure class="sheet bench-sheet" id="b-sheet"></figure>
+      <div class="bw-tools">
+        <button class="bw-btn" data-flip title="Turn the part upside down">⇅ Flip part</button>
+        <button class="bw-btn" data-view title="Look at the part again">🎯 View</button>
+        <button class="bw-btn" data-clear title="Take the tool off the part">✋ Tool off</button>
+      </div>
+      <div class="bw-loupe" id="b-loupe" hidden></div>
+      <p class="bw-status" id="b-status" role="status"></p>
+      <p class="bw-help">Drag to walk around the part · scroll or pinch to zoom · click the part to put the tool on</p>
     </div>
-    <div class="lab-body" id="b-panel"></div>`;
+    <aside class="bw-panel">
+      <section class="blk blk-problem bench-job" id="b-job"></section>
+      <figure class="sheet bench-sheet" id="b-sheet"></figure>
+      <div class="lab-body" id="b-panel"></div>
+    </aside>
+  </div>`;
   const $ = id => view.querySelector(id);
 
   function load(seed) {
@@ -53,6 +63,7 @@ export function renderBench(view, filterArg) {
     $('#b-sheet').innerHTML = `${DRAW[part.type](part, { active: f.key, done: {} })}
       <figcaption><span><b>${f.key}</b> is in blue</span><span>Tool: ${tool.short}</span></figcaption>`;
     if (bench) { bench.clearTool(); bench.setPart(geo, task.project.unit === 'mm' ? 1 / 25.4 : 1, false); }
+    $('.bw-panel').scrollTop = 0;
     draw();
   }
 
@@ -104,22 +115,32 @@ export function renderBench(view, filterArg) {
   }
 
   function draw() {
-    $('#b-score').textContent = `${st.right} measured right · saved in this browser`;
+    $('#b-score').textContent = `✓ ${st.right} measured right`;
     const n = picks.length, prompts = PROMPT[task.kind];
-    $('#b-status').className = `bench-status${msg ? ' no' : result ? ' ok' : ''}`;
-    $('#b-status').textContent = msg || (result ? `${MODE[result.mode]} Read the scale below. Click the part to move the tool.` : prompts[Math.min(n, prompts.length - 1)]);
+    $('#b-status').className = `bw-status${msg ? ' no' : result ? ' ok' : ''}`;
+    $('#b-status').textContent = msg || (result ? `${MODE[result.mode]} Read the zoomed-in scale and type it in. Click the part to move the tool.` : prompts[Math.min(n, prompts.length - 1)]);
     paint();
 
     const { tool, target, feature: f } = task;
     let panel;
+    $('#b-loupe').innerHTML = '';
+    $('#b-loupe').hidden = !(result && wide.matches);
     if (!result) {
       panel = `<div class="bench-empty"><p>The tool’s scale shows here, zoomed in, once the tool is on the part.</p>
         <button class="btn" data-show>Show me where it goes</button></div>`;
     } else {
       const spec = specAt(task, result.value), shown = solved || revealed;
-      panel = `<section class="blk blk-problem"><div class="blk-tag">Reading · ${tool.name}, zoomed in</div>
-          <p class="q">${tool.question(spec)}</p>
-          ${simHtml(tool, spec, shown && sameReading(task, result.value))}
+      const sim = simHtml(tool, spec, shown && sameReading(task, result.value));
+      // On a wide screen the zoomed-in scale floats over the bench, big; on a phone it sits with the answer box.
+      if (wide.matches) {
+        $('#b-loupe').innerHTML = `<div class="bw-loupe-head"><div class="blk-tag">${tool.name} · zoomed in on the scale</div>
+          <button class="${loupeMin ? 'bw-btn' : 'bw-x'}" data-loupe>${loupeMin ? '🔍 Show the scale' : 'Hide'}</button></div>${sim}`;
+        $('#b-loupe').classList.toggle('min', loupeMin);
+        $('#b-loupe [data-loupe]').addEventListener('click', () => { loupeMin = !loupeMin; draw(); });
+      }
+      panel = `<section class="blk blk-problem"><div class="blk-tag">Reading · ${tool.short}</div>
+          <p class="q">${tool.question(spec)}${wide.matches ? ' The scale is zoomed in over the bench.' : ''}</p>
+          ${wide.matches ? '' : sim}
           ${solved ? '' : answerForm(tool, spec)}
           <p class="fb ${fb ? (fb.ok ? 'ok' : 'no') : ''}" role="status">${fb ? fb.text : ''}</p>
         </section>
@@ -158,23 +179,21 @@ export function renderBench(view, filterArg) {
     flipped = !flipped; picks = []; result = null; msg = null; fb = null;
     bench.clearTool(); bench.setFlipped(flipped, true); draw();
   });
+  $('#b-filter').addEventListener('change', e => { location.hash = `#/bench/${e.target.value}`; });
   view.querySelector('[data-view]').addEventListener('click', () => bench?.frame());
   view.querySelector('[data-clear]').addEventListener('click', () => { if (solved) return; picks = []; result = null; msg = null; fb = null; bench?.clearTool(); draw(); });
 
   save();
   load(st.seed);
   // three.js only loads on this page.
-  const theme = () => bench?.setTheme(document.documentElement.dataset.theme === 'light');
-  const mo = new MutationObserver(theme); mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   import('../bench/scene.js').then(({ Bench }) => {
     if (gone) return;
     try { bench = new Bench($('#b-3d'), { onHover, onClick }); } catch {
       $('#b-3d').innerHTML = '<p class="bench-nogl">This browser can’t show 3D (WebGL is off). Try another browser or turn on hardware acceleration.</p>';
       return;
     }
-    theme();
     bench.setPart(geo, task.project.unit === 'mm' ? 1 / 25.4 : 1, false);
     draw();
   });
-  return () => { gone = true; mo.disconnect(); bench?.dispose(); };
+  return () => { gone = true; wide.removeEventListener('change', relayout); bench?.dispose(); document.body.classList.remove('bench-open'); };
 }
