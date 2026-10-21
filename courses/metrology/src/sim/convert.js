@@ -36,6 +36,7 @@ export const convert = {
     if (kind === 'in2mm') return { kind, value: rng.pick([rng.int(1, 40) * 25, rng.int(10, 3000)]) };
     return { kind, value: rng.pick([rng.int(1, 60) * 50, rng.int(50, 7500)]) };
   },
+  snap: s => s,
   draw: s => svg(1000, 150, text(500, 98, given(s), 'sv-given') + text(500, 136, KINDS[s.kind].label, 'sv-lbl'), KINDS[s.kind].label),
   steps(s) {
     const t = target(s);

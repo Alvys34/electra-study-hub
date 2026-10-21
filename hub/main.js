@@ -8,7 +8,7 @@ function started(c) {
 
 const card = c => `
   <a class="course" href="./${c.path}">
-    <span class="course-icon">${c.icon}</span>
+    <span class="course-icon"${c.tint ? ` style="background:${c.tint}"` : ''}>${c.icon}</span>
     <span class="course-body">
       <span class="course-subject">${c.subject}</span>
       <span class="course-title">${c.title}</span>

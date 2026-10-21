@@ -20,3 +20,11 @@ export const hatch = id =>
 
 export const svg = (w, h, body, label) =>
   `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+
+// Screens can't show a .001" (or 0.02 mm, or 5′) gap between vernier lines: it is under a pixel. This widens
+// small gaps between a vernier line and its nearest main line (f(0) = 0 and f(±half) = ±half), so the line that
+// truly lines up still lines up and its neighbours are visibly off, while the scale keeps its order.
+export function widen(gapPx, halfPx, p = 0.45) {
+  const a = Math.min(1, Math.abs(gapPx) / halfPx);
+  return Math.sign(gapPx) * halfPx * a ** p;
+}

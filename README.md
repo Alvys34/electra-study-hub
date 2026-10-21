@@ -1,10 +1,11 @@
-# Study Hub
+# Mechanical Technician Study Hub
 
 A home page of interactive courses. Each course is its own app in `courses/<id>/`, and the hub page lists them all.
 
 | Course | Folder | What it covers |
 |---|---|---|
-| ⚡ Electra | `courses/electra/` | Circuit Analysis (EMNG1001): 10 units with study sheets, hands-on 3D bench steps, practice and a free 3D lab |
+| ⚡ Circuit Analysis | `courses/electra/` | EMNG1001: 10 units with study sheets, hands-on 3D bench steps, practice and a free 3D lab |
+| 📐 Blueprint Reading & Metrology | `courses/metrology/` | CRN-20405: rules, conversions, calipers, micrometers, height gage and protractors, with movable instruments and a 10-problem lab per module |
 
 ## Run it
 
@@ -15,6 +16,12 @@ npm run dev      # open the address it prints (usually http://localhost:5173)
 
 On Windows you can double-click `Start-Hub.bat` instead.
 
+## Test it
+
+```
+npm test         # lab progression, answer parsing and every instrument's step-by-step maths
+```
+
 ## Publish it
 
 Every push to `main` builds the site and publishes it to GitHub Pages (`.github/workflows/pages.yml`).
@@ -24,7 +31,7 @@ Turn it on once in the repo: **Settings → Pages → Source: GitHub Actions**.
 
 ## Offline copy
 
-`npm run standalone:electra` writes `release/Electra/Open Electra.html`, a single file with everything inlined
+`npm run standalone:electra` writes `release/Electra/Open Electra.html` (Circuit Analysis), a single file with everything inlined
 that opens without a server or internet.
 
 ## Layout

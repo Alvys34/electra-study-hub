@@ -1,6 +1,6 @@
 // vernier.js - vernier caliper (inch .001 and metric 0.02 mm) and the vernier height gage.
 // The magnifier keeps the vernier plate still and slides the main scale, like looking through a loupe.
-import { line, rect, text, hatch, nextId, svg } from './svg.js';
+import { line, rect, text, hatch, nextId, svg, widen } from './svg.js';
 import { fmtIn, fmtMm, parseNum, near } from '../core/answer.js';
 
 const CFG = {
@@ -36,7 +36,8 @@ function loupe(s, reveal, rot) {
     if (label) b += text(x, rot ? B - len - 12 : B - len - 10, label, big ? 'sv-lbl sv-lbl-big' : 'sv-lbl', mainAnchor, rot);
   }
   for (let j = 0; j <= c.n; j++) {
-    const x = c.u0 + j * (c.main - c.least) * c.ppu, len = j % 5 === 0 ? 34 : 22;
+    const vj = value + j * (c.main - c.least), near = Math.round(vj / c.main) * c.main;
+    const x = u(near) + widen((vj - near) * c.ppu, (c.main * c.ppu) / 2), len = j % 5 === 0 ? 34 : 22;
     const cls = reveal && j === j0 && j0 ? 'sv-tick sv-ans' : j === 0 ? 'sv-tick sv-zero' : 'sv-tick';
     b += line(x, B, x, B + len, cls);
     if (j % 5 === 0) b += text(x, rot ? B + len + 12 : B + len + 22, String(s.sys === 'in' ? j : j / 5), 'sv-lbl', vernAnchor, rot);

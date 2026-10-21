@@ -1,6 +1,6 @@
 // protractor.js - universal bevel protractor (vernier, 5′) and plate protractor (whole degrees).
 // The magnifier shows a slice of the dial: the vernier plate stays put and the dial turns under it.
-import { svg, r } from './svg.js';
+import { svg, r, widen } from './svg.js';
 import { fmtAngle } from '../core/answer.js';
 
 const PPD = 18, RAD = PPD * 180 / Math.PI, CX = 500, CY = RAD + 92, VSTEP = 23 / 12;
@@ -33,7 +33,8 @@ function draw(s, { reveal }) {
   if (plate) b += seg(RAD - 50, RAD + 10, 0, 'sv-edge');
   else {
     for (let j = -12; j <= 12; j++) {
-      const psi = j * VSTEP * dir, m = Math.abs(j);
+      const aj = v + j * VSTEP, near = Math.round(aj), m = Math.abs(j);
+      const psi = ((near - v) + widen((aj - near) * PPD, PPD / 2) / PPD) * dir;
       const cls = reveal && j === j0 && j0 ? 'sv-tick sv-ans' : j === 0 ? 'sv-tick sv-zero' : 'sv-tick';
       b += seg(RAD, RAD - (m % 3 === 0 ? 30 : 18), psi, cls);
       if (m % 3 === 0) b += lbl(RAD - 50, psi, String(m * 5));
