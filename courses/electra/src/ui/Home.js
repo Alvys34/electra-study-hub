@@ -197,7 +197,7 @@ export function renderTopbar(el) {
   const lv = levelFor(s.xp);
   // The standalone offline file has no hub to go back to, so the hub link only exists in the hub build.
   const hub = import.meta.env.VITE_STANDALONE ? '' : `<a class="hub-link" href="../../" title="All courses" aria-label="Back to the study hub">⌂</a>`;
-  el.innerHTML = `<div class="tb-left">${hub}<a class="brand" href="#/"><span class="bolt">⚡</span><span>Electra</span><small class="brand-tag">EMNG1001</small></a></div>
+  el.innerHTML = `<div class="tb-left">${hub}<a class="brand" href="#/"><span class="bolt">⚡</span><span>Circuit Analysis</span><small class="brand-tag">EMNG1001</small></a></div>
     <div class="tb-right">
       <div class="lvl" title="${s.xp} XP total"><span class="lvl-n">Lv ${lv.level}</span><span class="lvl-name">${levelName(lv.level)}</span><span class="lvl-bar"><i style="width:${(lv.into / lv.need) * 100}%"></i></span></div>
       <div class="streak ${s.streak.count ? 'on' : ''}" title="Study streak (days in a row)">🔥 ${s.streak.count}</div>
