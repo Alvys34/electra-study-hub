@@ -5,7 +5,7 @@ A home page of interactive courses. Each course is its own app in `courses/<id>/
 | Course | Folder | What it covers |
 |---|---|---|
 | ⚡ Circuit Analysis | `courses/electra/` | EMNG1001: 10 units with study sheets, hands-on 3D bench steps, practice and a free 3D lab |
-| 📐 Blueprint Reading & Metrology | `courses/metrology/` | CRN-20405: rules, conversions, calipers, micrometers, height gage and protractors, with movable instruments and a 10-problem lab per module |
+| 📐 Blueprint Reading & Metrology | `courses/metrology/` | CRN-20405: rules, conversions, calipers, micrometers, height gage and protractors, with movable instruments, a 10-problem lab per module, and shop projects 1–9 (measure a random part on a drawing) |
 
 ## Run it
 
