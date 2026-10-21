@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-const COL = { part: 0xb7c1cb, hover: 0x1aa6c8, picked: 0xf2b84b, edge: 0x1d2630, steel: 0xdfe4e9, dark: 0x3c4a5a, granite: 0x2a2f37 };
+const COL = { part: 0xc3ccd5, hover: 0x1aa6c8, picked: 0xf2b84b, edge: 0x1d2630, steel: 0xdfe4e9, dark: 0x3c4a5a, granite: 0x2a2f37 };
 const v3 = a => new THREE.Vector3(...a);
 
 export class Bench {
@@ -21,21 +21,7 @@ export class Bench {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     Object.assign(this.controls, { enableDamping: true, dampingFactor: 0.1, enablePan: false, maxPolarAngle: 1.52 });
 
-    // A soft studio reflection so the steel reads as metal.
-    const pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; pmrem.dispose();
-    this.scene.environmentIntensity = 0.7;
-    this.scene.add(new THREE.HemisphereLight(0xe6f0ff, 0x30281c, 0.6));
-    const key = new THREE.DirectionalLight(0xffffff, 1.6);
-    key.position.set(4, 9, 6); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02;
-    Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6 });
-    this.scene.add(key);
-    const fill = new THREE.DirectionalLight(0x9cc8ff, 0.8); fill.position.set(-6, 3, -4); this.scene.add(fill);
-
-    this.plate = new THREE.Mesh(new THREE.BoxGeometry(14, 0.6, 9), new THREE.MeshStandardMaterial({ color: COL.granite, roughness: 0.75 }));
-    this.plate.position.y = -0.3; this.plate.receiveShadow = true;
-    this.plate.userData.surface = 'plate';
-    this.scene.add(this.plate);
+    this.buildRoom();
 
     this.partGroup = new THREE.Group(); this.scene.add(this.partGroup);
     this.tool = null; this.meshes = []; this.hovered = null; this.state = {};
@@ -46,8 +32,78 @@ export class Bench {
     this.tick = this.tick.bind(this); this.raf = requestAnimationFrame(this.tick);
   }
 
-  setTheme(light) {
-    this.scene.background = new THREE.Color(light ? 0xe9ecef : 0x0f1822);
+  // The shop: a wooden workbench against a pegboard wall, a granite surface plate on it, a lamp over it.
+  buildRoom() {
+    const s = this.scene;
+    s.background = new THREE.Color(0x0e141c);
+    s.fog = new THREE.Fog(0x0e141c, 45, 95);
+    // A soft studio reflection so the steel reads as metal.
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    s.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; pmrem.dispose();
+    s.environmentIntensity = 0.55;
+    s.add(new THREE.HemisphereLight(0xdbe8ff, 0x2a2016, 0.55));
+    const key = new THREE.DirectionalLight(0xfff4e6, 1.7);
+    key.position.set(6, 16, 9); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02;
+    Object.assign(key.shadow.camera, { left: -12, right: 12, top: 10, bottom: -10, near: 1, far: 50 });
+    s.add(key);
+    const rim = new THREE.DirectionalLight(0x8fbcff, 0.7); rim.position.set(-10, 6, -8); s.add(rim);
+
+    const tex = (w, h, draw) => {
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+      const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+    };
+    const std = (o) => new THREE.MeshStandardMaterial(o);
+
+    // Workbench top (maple butcher block) and legs.
+    const wood = tex(1024, 512, (c, w, h) => {
+      c.fillStyle = '#9a6b3f'; c.fillRect(0, 0, w, h);
+      for (let y = 0; y < h; y += 32) { c.fillStyle = `rgba(${y % 64 ? '60,35,15' : '255,220,170'},.08)`; c.fillRect(0, y, w, 30); }
+      c.strokeStyle = 'rgba(50,28,10,.25)';
+      for (let i = 0; i < 160; i++) { const y = Math.random() * h; c.beginPath(); c.moveTo(0, y); c.bezierCurveTo(w / 3, y + 6, (2 * w) / 3, y - 6, w, y + 2); c.stroke(); }
+    });
+    const top = new THREE.Mesh(new THREE.BoxGeometry(56, 2, 20), std({ map: wood, roughness: 0.7 }));
+    top.position.set(0, -3.5, -4); top.receiveShadow = true; s.add(top);
+    const legMat = std({ color: 0x3a3f47, roughness: 0.6, metalness: 0.4 });
+    [[-26, 4], [26, 4], [-26, -12], [26, -12]].forEach(([x, z]) => { const l = new THREE.Mesh(new THREE.BoxGeometry(2, 30, 2), legMat); l.position.set(x, -20, z); s.add(l); });
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), std({ color: 0x20262e, roughness: 0.95 }));
+    floor.rotation.x = -Math.PI / 2; floor.position.y = -35; s.add(floor);
+
+    // Pegboard wall with a few shapes hanging on it, and a sign.
+    const peg = tex(1024, 512, (c, w, h) => {
+      c.fillStyle = '#c9b48f'; c.fillRect(0, 0, w, h); c.fillStyle = '#7a6748';
+      for (let y = 16; y < h; y += 32) for (let x = 16; x < w; x += 32) { c.beginPath(); c.arc(x, y, 4, 0, 7); c.fill(); }
+    });
+    peg.wrapS = peg.wrapT = THREE.RepeatWrapping; peg.repeat.set(2, 1);
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(90, 40), std({ map: peg, roughness: 0.9 }));
+    wall.position.set(0, 14, -15); s.add(wall);
+    const hang = std({ color: 0xc8102e, roughness: 0.5, metalness: 0.2 }), chrome = std({ color: 0xd5dae0, metalness: 0.8, roughness: 0.25 });
+    [[-22, 12, 'wrench'], [-18, 13, 'wrench'], [18, 14, 'square'], [23, 12, 'hammer']].forEach(([x, y, kind]) => {
+      const g = new THREE.Group();
+      if (kind === 'wrench') g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 8, 0.3), chrome));
+      if (kind === 'square') { g.add(new THREE.Mesh(new THREE.BoxGeometry(0.7, 8, 0.2), chrome)); const b = new THREE.Mesh(new THREE.BoxGeometry(5, 1, 0.5), std({ color: 0x2d3540 })); b.position.y = -3.6; b.position.x = 2.2; g.add(b); }
+      if (kind === 'hammer') { const h = new THREE.Mesh(new THREE.BoxGeometry(0.8, 9, 0.6), hang); g.add(h); const hd = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.2, 1.2), legMat); hd.position.y = 4.4; g.add(hd); }
+      g.position.set(x, y, -14.6); s.add(g);
+    });
+    const sign = tex(1024, 192, (c, w, h) => {
+      c.font = 'bold 96px "Space Grotesk", Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.shadowColor = '#4cc3e0'; c.shadowBlur = 28; c.fillStyle = '#c6f3ff'; c.fillText('METROLOGY LAB', w / 2, h / 2);
+    });
+    const signMesh = new THREE.Mesh(new THREE.PlaneGeometry(22, 4.1), new THREE.MeshBasicMaterial({ map: sign, transparent: true }));
+    signMesh.position.set(0, 22, -14.5); s.add(signMesh);
+
+    // Bench lamp over the plate, warm light.
+    const lampMat = std({ color: 0x1f6f8b, roughness: 0.45, metalness: 0.3 });
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, 0.6, 32), lampMat); base.position.set(-16, -2.2, -9); s.add(base);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 15, 12), chrome); arm.position.set(-14, 4.5, -7); arm.rotation.z = -0.3; arm.rotation.x = 0.25; s.add(arm);
+    const shade = new THREE.Mesh(new THREE.ConeGeometry(2.4, 3, 32, 1, true), std({ color: 0x1f6f8b, side: THREE.DoubleSide, roughness: 0.4 }));
+    shade.position.set(-11.5, 11.5, -4.5); shade.rotation.z = -0.5; s.add(shade);
+    const bulb = new THREE.PointLight(0xffd59a, 55, 40, 1.6); bulb.position.set(-11, 10.5, -4); s.add(bulb);
+
+    // Granite surface plate on the bench: its top is y = 0. Clicking it stands for the part's face lying on it.
+    this.plate = new THREE.Mesh(new THREE.BoxGeometry(15, 2.5, 9), std({ color: COL.granite, roughness: 0.7 }));
+    this.plate.position.set(0, -1.25, 0); this.plate.receiveShadow = true; this.plate.castShadow = true;
+    this.plate.userData.surface = 'plate';
+    s.add(this.plate);
   }
 
   // Builds one mesh per surface (so each can light up on its own) plus dark outlines on the edges.
@@ -92,12 +148,16 @@ export class Bench {
     if (frame) this.frame();
   }
 
+  // Points the camera at the part. The first time, it walks up to the bench from across the room.
   frame() {
-    const size = this.box.getSize(new THREE.Vector3()), c = this.box.getCenter(new THREE.Vector3()), R = Math.max(size.x, size.y, size.z, 2.2);
-    this.controls.target.copy(c);
-    this.camera.position.set(c.x + R * 0.9, c.y + R * 0.95, c.z + R * 1.9);
-    this.controls.minDistance = R * 0.5; this.controls.maxDistance = R * 5;
-    this.controls.update();
+    // Standing at the bench: a little to the right, looking down at the plate, with the bench and wall in view.
+    const size = this.box.getSize(new THREE.Vector3()), c = this.box.getCenter(new THREE.Vector3()), R = Math.max(size.x, size.y, size.z, 4);
+    const to = new THREE.Vector3(c.x + R * 0.35, c.y + R * 1.25, c.z + R * 2.9);
+    Object.assign(this.controls, { minDistance: 1.5, maxDistance: 40, minPolarAngle: 0.15, maxPolarAngle: 1.45 });
+    const from = this.walked ? this.camera.position.clone() : new THREE.Vector3(4, 14, 42);
+    const fromT = this.walked ? this.controls.target.clone() : new THREE.Vector3(0, 6, -10);
+    this.walked = true;
+    this.cam = { from, to, fromT, toT: c.clone(), t0: performance.now(), dur: from.distanceTo(to) > 20 ? 1600 : 500 };
   }
 
   // { hover: surface, picked: [surfaces] } -> colours.
@@ -223,6 +283,12 @@ export class Bench {
 
   tick(now) {
     this.raf = requestAnimationFrame(this.tick);
+    if (this.cam) {
+      const k = Math.min(1, (now - this.cam.t0) / this.cam.dur), e = k < 0.5 ? 4 * k ** 3 : 1 - (-2 * k + 2) ** 3 / 2;
+      this.camera.position.lerpVectors(this.cam.from, this.cam.to, e);
+      this.controls.target.lerpVectors(this.cam.fromT, this.cam.toT, e);
+      if (k === 1) this.cam = null;
+    }
     if (this.anim) {
       const k = Math.min(1, (now - this.anim.t0) / 420), ease = 1 - (1 - k) ** 3;
       this.anim.obj.position.copy(this.anim.from).multiplyScalar(1 - ease);
