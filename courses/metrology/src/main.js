@@ -5,6 +5,7 @@ import { renderLesson } from './ui/lesson.js';
 import { renderLab } from './ui/lab.js';
 import { renderPractice } from './ui/practice.js';
 import { renderProject } from './ui/project.js';
+import { renderBench } from './ui/bench.js';
 import { MODULES } from './content/modules.js';
 import { getTheme, setTheme } from './core/store.js';
 
@@ -25,12 +26,16 @@ function topbar() {
   });
 }
 
+let leave = null; // the 3D bench stops its renderer when you go to another page
+
 function route() {
   const view = document.getElementById('view');
+  leave?.(); leave = null;
   const [, page, a, b] = location.hash.replace(/^#/, '').split('/');
   if (page === 'm') renderLesson(view, a);
   else if (page === 'lab' && MODULES.some(m => m.id === a)) renderLab(view, MODULES.find(m => m.id === a));
   else if (page === 'project') renderProject(view, a);
+  else if (page === 'bench') leave = renderBench(view, a);
   else if (page === 'practice') renderPractice(view, a, Number(b) || 0);
   else renderHome(view);
   window.scrollTo(0, 0);

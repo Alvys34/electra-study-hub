@@ -18,7 +18,7 @@ export const COURSES = [
     tint: 'linear-gradient(135deg, #67e8f9, #0e86a6)',
     title: 'Blueprint Reading & Metrology',
     subject: 'CRN-20405',
-    blurb: 'Steel rules, unit conversions, vernier and dial calipers, micrometers, height gages and protractors, with instruments you can move and a lab in every module.',
+    blurb: 'Steel rules, unit conversions, vernier and dial calipers, micrometers, height gages and protractors, with instruments you can move, a lab in every module and a 3D measuring bench.',
     units: 6,
     progressKey: 'metrology.progress.v1',
   },
