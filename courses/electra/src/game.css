@@ -1,0 +1,148 @@
+/* game.css — key-term chips + definition popover, and the 3D workbench HUD (lesson benches + Free Lab) */
+
+/* ---------- key terms: clickable definition chips ---------- */
+.kw {
+  display: inline;
+  padding: 1.5px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+  color: #fde68a;
+  background: rgba(250, 204, 21, .14);
+  border-bottom: 1.5px dashed rgba(250, 204, 21, .7);
+  cursor: pointer;
+  white-space: nowrap;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.kw.kw-wrap { white-space: normal; }
+.kw:hover, .kw:focus-visible, .kw.kw-open {
+  color: #fffbeb;
+  background: rgba(250, 204, 21, .28);
+  border-bottom-style: solid;
+  border-bottom-color: #facc15;
+  box-shadow: 0 3px 12px rgba(250, 204, 21, .22);
+  outline: none;
+}
+.kw.bad { color: #fecaca; background: rgba(248, 113, 113, .16); border-bottom-color: rgba(248, 113, 113, .65); }
+.kw.bad:hover, .kw.bad.kw-open { background: rgba(248, 113, 113, .28); border-bottom-color: #f87171; }
+/* Keep regular bold text distinct from clickable yellow .kw terms */
+.card .body b, .card .lead b, .recap li b, .hint b, .why b, .sol li b, .cheat li b {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+/* ---------- clickable .kw definition popover ---------- */
+.kw-pop {
+  position: fixed; z-index: 280; width: min(360px, calc(100vw - 24px));
+  padding: 15px 17px 13px; border-radius: 18px;
+  background: linear-gradient(180deg, rgba(24, 35, 64, .98), rgba(13, 20, 38, .99));
+  border: 1.5px solid rgba(250, 204, 21, .6);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, .65), 0 0 28px rgba(250, 204, 21, .2), inset 0 1px 0 rgba(255, 255, 255, .12);
+  backdrop-filter: blur(14px); color: var(--ink);
+  animation: pop .2s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+.kw-pop::after {
+  content: ''; position: absolute; left: var(--caret-x, 50%); top: -7px;
+  width: 12px; height: 12px; margin-left: -6px;
+  background: rgba(24, 35, 64, .98);
+  border-left: 1.5px solid rgba(250, 204, 21, .6);
+  border-top: 1.5px solid rgba(250, 204, 21, .6);
+  transform: rotate(45deg);
+}
+.kw-pop.above::after {
+  top: auto; bottom: -7px;
+  background: rgba(13, 20, 38, .99);
+  border-left: 0; border-top: 0;
+  border-right: 1.5px solid rgba(250, 204, 21, .6);
+  border-bottom: 1.5px solid rgba(250, 204, 21, .6);
+}
+.kw-pop-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 7px; }
+.kw-pop-tag { display: inline-block; font-family: var(--mono); font-size: var(--fs-label); font-weight: 700; color: var(--bolt); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+.kw-pop-title { display: block; font-family: var(--display); font-size: var(--fs-h3); line-height: 1.2; color: #fff; }
+.kw-pop-x { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: var(--fs-small); color: var(--ink-3); background: rgba(255, 255, 255, .07); transition: background .15s, color .15s; }
+.kw-pop-x:hover { background: rgba(255, 255, 255, .15); color: #fff; }
+.kw-pop-def { font-size: var(--fs-ui); line-height: 1.58; color: var(--ink-2); margin: 0; }
+.kw-pop-eq { margin-top: 10px; padding: 8px 11px; border-radius: 10px; background: rgba(6, 10, 22, .6); border: 1px dashed rgba(56, 189, 248, .45); font-family: var(--mono); font-size: var(--fs-small); font-weight: 700; color: #7dd3fc; text-align: center; }
+.kw-pop-foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .08); display: flex; justify-content: space-between; align-items: center; font-size: var(--fs-label); color: var(--ink-3); font-family: var(--mono); }
+
+/* ---------- 3D bench: stage, floating labels, HUD ---------- */
+body.playing { overflow: hidden; }
+body.playing #shell { display: none; }
+.g-stage { position: absolute; inset: 0; }
+.g-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.g-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.g-label { position: absolute; left: 0; top: 0; white-space: nowrap; font-family: var(--mono); font-size: var(--fs-small); font-weight: 700; color: #e2e8f0;
+  padding: 3px 8px; border-radius: 8px; background: rgba(10, 15, 30, .72); border: 1px solid rgba(255,255,255,.12); }
+.g-label.val { color: #7dd3fc; }
+.g-label.meter { font-size: var(--fs-h3); color: #bef264; background: rgba(5, 20, 10, .85); border-color: rgba(190, 242, 100, .4); }
+.g-label.meter b { font-size: var(--fs-h3); }
+.g-label.bin { font-family: var(--display); letter-spacing: .12em; font-size: var(--fs-label); color: #93c5fd; background: none; border: 0; }
+.g-label.binitem { font-size: var(--fs-label); color: #fde68a; }
+.g-label.binitem:empty { display: none; }
+.g-label.itag { font-size: var(--fs-ui); color: #fde68a; border-color: rgba(250,204,21,.5); background: rgba(40, 30, 0, .8); }
+
+.g-hud > * { pointer-events: auto; }
+.g-hud { position: absolute; inset: 0; pointer-events: none; }
+
+.g-top { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; align-items: center; gap: 12px; pointer-events: none; }
+.g-top > * { pointer-events: auto; }
+.g-btn { padding: 9px 14px; border-radius: 12px; font-weight: 700; font-size: var(--fs-ui); color: var(--ink); background: rgba(19, 28, 51, .88); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+.g-btn:hover { background: rgba(30, 42, 72, .95); }
+.g-btn:disabled { opacity: .4; }
+.g-title { padding: 6px 14px; border-radius: 12px; background: rgba(19, 28, 51, .75); backdrop-filter: blur(8px); }
+.g-title small { display: block; font-family: var(--mono); font-size: var(--fs-label); color: var(--bolt); }
+.g-title b { font-family: var(--display); font-size: var(--fs-h3); }
+.g-top-r { margin-left: auto; display: flex; gap: 8px; }
+
+@keyframes pop { from { transform: scale(.9) translateY(6px); opacity: .4; } }
+
+.g-hintbar { position: absolute; left: 50%; top: 76px; transform: translateX(-50%); padding: 9px 16px; border-radius: 999px; background: rgba(250, 204, 21, .95); color: #1c1400; font-weight: 700; font-size: var(--fs-ui); white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+.g-hintbar .kw { color: #1c1400; background: rgba(255,255,255,.5); box-shadow: none; }
+.g-tip { position: fixed; z-index: 60; max-width: 300px; padding: 9px 12px; border-radius: 12px; background: rgba(15, 23, 42, .96); border: 1px solid var(--line); font-size: var(--fs-ui); line-height: 1.4; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.g-tip small { display: block; color: var(--ink-3); font-size: var(--fs-small); margin-top: 2px; }
+.g-tip .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; background: var(--c); margin: 0 3px -1px 6px; border: 1px solid rgba(255,255,255,.4); }
+
+@media (max-width: 720px) {
+  .g-title b { font-size: var(--fs-ui); }
+  .g-hintbar { top: auto; bottom: 200px; white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 24px); }
+}
+
+.g-label.pointer { background: none; border: 0; font-size: 28px; padding: 0; animation: bounceDown 1s ease-in-out infinite; filter: drop-shadow(0 2px 6px rgba(0,0,0,.6)); }
+@keyframes bounceDown { 50% { margin-top: 8px; } }
+
+/* ---------- FreeLab 3D Workbench (#/lab) ---------- */
+.fl-top { flex-wrap: wrap; gap: 8px; }
+.fl-top .g-title { padding: 5px 12px; }
+.fl-top .g-title b { font-size: var(--fs-body); }
+.fl-top .g-btn { padding: 7px 11px; font-size: var(--fs-small); }
+.fl-shelf { display: flex; flex-wrap: wrap; gap: 5px; padding: 4px; border-radius: 14px; background: rgba(13, 20, 38, .85); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+.fl-add { padding: 6px 9px !important; font-size: var(--fs-small) !important; border-radius: 10px; transition: all .15s; }
+.fl-add:hover { border-color: var(--bolt); color: #fff; transform: translateY(-1px); }
+.fl-tpl { cursor: pointer; appearance: auto; background: rgba(19, 28, 51, .92); color: var(--ink); max-width: 175px; }
+.fl-tele { position: absolute; left: 12px; top: 68px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 7px 13px; border-radius: 14px; background: rgba(13, 20, 38, .88); border: 1px solid var(--line); backdrop-filter: blur(10px); font-family: var(--mono); font-size: var(--fs-label); color: var(--ink-2); box-shadow: 0 10px 28px rgba(0,0,0,.35); }
+.fl-tele b { color: #e2e8f0; }
+.fl-tele-badge { padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.07); font-weight: 700; color: #bef264; }
+.fl-insp { position: absolute; right: 12px; top: 68px; width: min(336px, calc(100vw - 24px)); padding: 15px 17px; border-radius: 18px; background: linear-gradient(180deg, rgba(19, 28, 52, .96), rgba(12, 18, 36, .98)); border: 1.5px solid rgba(56, 189, 248, .5); box-shadow: 0 20px 52px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(12px); animation: pop .2s both; }
+.fl-insp[hidden] { display: none !important; }
+.fl-insp-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--line); }
+.fl-insp-h b { font-family: var(--display); font-size: var(--fs-body); }
+.fl-insp-acts { display: flex; gap: 6px; }
+.icon-btn.xs { min-width: 30px; height: 30px; padding: 0 7px; font-size: var(--fs-ui); border-radius: 9px; }
+.fl-insp-b { display: grid; gap: 10px; font-size: var(--fs-ui); }
+.fl-stats { padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.06); font-family: var(--mono); font-size: var(--fs-label); color: var(--ink-2); text-align: center; }
+.fl-stats b { color: #bef264; white-space: nowrap; }
+.fl-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.fl-presets .pchip { min-width: 0; padding: 6px 4px; font-size: var(--fs-small); }
+.fl-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.fl-row input[type=range] { flex: 1; accent-color: var(--accent); }
+.inp.xs { padding: 6px 9px; font-size: var(--fs-small); border-radius: 9px; width: 105px; }
+.fl-help { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(10, 15, 30, .82); border: 1px solid rgba(255,255,255,.1); font-size: var(--fs-small); color: var(--ink-2); white-space: nowrap; pointer-events: none; }
+@media (max-width: 1120px) {
+  .fl-tele, .fl-insp { top: 114px; }
+}
+@media (max-width: 780px) {
+  .fl-help, .fl-tele { display: none; }
+  .fl-insp { top: auto; bottom: 12px; right: 12px; left: 12px; width: auto; }
+}
+
