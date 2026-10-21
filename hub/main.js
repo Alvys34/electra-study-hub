@@ -20,7 +20,7 @@ const card = c => `
 
 document.getElementById('hub').innerHTML = `
   <header class="hub-head">
-    <h1>Study Hub</h1>
+    <h1>Mechanical Technician Study Hub</h1>
     <p>Pick a course. Your progress is saved in this browser.</p>
   </header>
   <main class="courses">${COURSES.map(card).join('')}</main>`;
