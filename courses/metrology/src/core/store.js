@@ -24,3 +24,7 @@ export function markRead(id) { if (!data.read[id]) { data.read[id] = true; save(
 
 export function getTheme() { try { return localStorage.getItem('metrology.theme'); } catch { return null; } }
 export function setTheme(t) { try { localStorage.setItem('metrology.theme', t); } catch { /* ignore */ } }
+
+// The 3D bench: the job on the bench (by seed), the tool filter, and a running count.
+export const getBench = () => data.bench || null;
+export function putBench(b) { data.bench = b; save(); }
