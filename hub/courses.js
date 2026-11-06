@@ -21,7 +21,8 @@ export const COURSES = [
       const next = UNITS.find(u => !done(u));
       const labs = read('electra.labs.v1') || {};
       const started = Object.values(labs.guide || {}).filter(g => g && Array.isArray(g.seen) && g.seen.length).length;
-      const last = labs.last && /^[6-9]$/.test(String(labs.last.lab)) ? labs.last : null;
+      const lastNum = String(labs.last?.lab ?? '').replace(/^lab/, ''); // older saves stored 'lab6'
+      const last = /^[6-9]$/.test(lastNum) ? { ...labs.last, lab: lastNum } : null;
       return {
         stats: [
           ['Sheets read', `${UNITS.filter(sheet).length}/${UNITS.length}`],

@@ -7,6 +7,9 @@ import { sfx, giveXP, burst, toast, celebrateSmall, celebrateBig } from '../core
 import { buddy } from '../ui/Buddy.js';
 
 // unit-less answers get powers of ten, never a bare SI prefix ("4.2 T" would read as tesla)
+/** A fixed-unit answer as typed digits, without float noise: 11.999999999999998 -> "12". */
+const fixedNum = x => plain(x, 6).replace(/,/g, '');
+
 function showAnswer(x, unit) {
   if (unit) return eng(x, unit, 4);
   if (x === 0 || (Math.abs(x) >= 1e-3 && Math.abs(x) < 1e4)) return plain(x);
@@ -26,7 +29,8 @@ export class PracticeSession {
     this.lastGen = null; this.queue = null;
     this.onKey = this.onKey.bind(this);
     if (mode === 'review') {
-      this.queue = shuffle(store.get().missed.slice()).slice(0, 10);
+      // skip saved misses whose question type no longer exists (it would load as a blank page)
+      this.queue = shuffle(store.get().missed.filter(m => m && UNIT_GENERATORS[m.unit]?.[m.gen])).slice(0, 10);
       this.total = this.queue.length;
     }
     this.unit = UNITS.find(u => u.id === mode);
@@ -59,7 +63,7 @@ export class PracticeSession {
     this.next();
   }
 
-  unmount() { window.removeEventListener('keydown', this.onKey); clearInterval(this.timer); }
+  unmount() { this.dead = true; window.removeEventListener('keydown', this.onKey); clearInterval(this.timer); clearTimeout(this.advT); }
 
   title() {
     if (this.mode === 'mix') return '🧩 Exam mix';
@@ -79,7 +83,8 @@ export class PracticeSession {
     if (this.mode === 'review') { const m = this.queue[this.results.length]; return makeProblem(m.unit, m.gen); }
     if (this.mode === 'mix' || this.mode === 'blitz') {
       // favour units already learned, but include everything
-      const learned = UNITS.filter(u => store.get().learn[u.id]?.seen > 3).map(u => u.id);
+      const learn = store.get().learn;
+      const learned = UNITS.filter(u => { const l = learn[`lesson-${u.id}`]; return l?.done || l?.seen > 3 || learn[`lesson-${u.id}-read`]?.done; }).map(u => u.id);
       const pool = learned.length >= 2 && Math.random() < 0.75 ? learned : UNITS.map(u => u.id);
       for (let tries = 0; tries < 30; tries++) {
         const u = pick(pool); const g = randomGen(u, this.lastGen);
@@ -211,7 +216,10 @@ export class PracticeSession {
     this.dots();
     this.actions();
     this.showSolution(!firstTry);
-    if (this.mode === 'blitz') setTimeout(() => { if (this.done && this.p === this._lastP) this.next(); }, firstTry ? 500 : 1800);
+    if (this.mode === 'blitz') {
+      clearTimeout(this.advT);
+      this.advT = setTimeout(() => { if (!this.dead && this.done && this.p === this._lastP) this.next(); }, firstTry ? 500 : 1800);
+    }
     this._lastP = this.p;
   }
 
@@ -250,7 +258,7 @@ export class PracticeSession {
         else if (Math.abs(lg - Math.round(lg)) < 0.01 && Math.round(lg) !== 0) nudge = ' Right digits, wrong decimal place.';
       }
       if (this.tries >= 3) {
-        this.feedback(`❌ The answer is <b>${this.p.fixed ? this.p.answer + ' ' + this.p.unit : eng(this.p.answer, this.p.unit, 4)}</b>. Look at the steps below.`, 'no');
+        this.feedback(`❌ The answer is <b>${this.p.fixed ? fixedNum(this.p.answer) + ' ' + this.p.unit : eng(this.p.answer, this.p.unit, 4)}</b>. Look at the steps below.`, 'no');
         inp.disabled = true; this.finishProblem(false);
       } else {
         this.feedback(`❌ Not quite.${nudge} ${this.tries === 1 ? 'Try again, or grab a hint.' : 'Last try!'}`, 'no');
@@ -277,9 +285,9 @@ export class PracticeSession {
       inp.classList.add('wrong'); setTimeout(() => inp.classList.remove('wrong'), 450);
       if (this.partTries >= 2) {
         this.anyMissPart = true;
-        inp.value = pt.fixed ? pt.answer : eng(pt.answer, '', 4).replace(' ', '');
+        inp.value = pt.fixed ? fixedNum(pt.answer) : eng(pt.answer, '', 4).replace(' ', '');
         inp.disabled = true; row.classList.add('given'); row.querySelector('.pres').textContent = '→';
-        this.feedback(`That one is <b>${pt.fixed ? pt.answer + ' ' + pt.unit : eng(pt.answer, pt.unit, 4)}</b>. Filled it in so you can carry on.`, 'warn');
+        this.feedback(`That one is <b>${pt.fixed ? fixedNum(pt.answer) + ' ' + pt.unit : eng(pt.answer, pt.unit, 4)}</b>. Filled it in so you can carry on.`, 'warn');
         this.advancePart(k);
       } else {
         this.feedback('❌ Not quite. One more go (or take a hint).', 'no');
@@ -308,9 +316,9 @@ export class PracticeSession {
     this.tries = 9;
     if (this.p.kind === 'num') {
       const inp = this.root.querySelector('#inp'); inp.disabled = true;
-      this.feedback(`Answer: <b>${this.p.fixed ? this.p.answer + ' ' + this.p.unit : eng(this.p.answer, this.p.unit, 4)}</b>`, 'warn');
+      this.feedback(`Answer: <b>${this.p.fixed ? fixedNum(this.p.answer) + ' ' + this.p.unit : eng(this.p.answer, this.p.unit, 4)}</b>`, 'warn');
     } else if (this.p.kind === 'multi') {
-      this.root.querySelectorAll('.part').forEach((row, k) => { const pt = this.p.parts[k]; const i = row.querySelector('input'); if (!row.classList.contains('ok')) { i.value = pt.fixed ? pt.answer : eng(pt.answer, '', 4).replace(' ', ''); i.disabled = true; row.classList.remove('locked', 'active'); row.classList.add('given'); } });
+      this.root.querySelectorAll('.part').forEach((row, k) => { const pt = this.p.parts[k]; const i = row.querySelector('input'); if (!row.classList.contains('ok')) { i.value = pt.fixed ? fixedNum(pt.answer) : eng(pt.answer, '', 4).replace(' ', ''); i.disabled = true; row.classList.remove('locked', 'active'); row.classList.add('given'); } });
       this.anyMissPart = true;
       this.feedback('Here\'s the full working. Try the next one yourself!', 'warn');
     }
@@ -326,6 +334,8 @@ export class PracticeSession {
 
   onKey(e) {
     if (e.target.matches('input')) return;
+    // Enter on a focused button or link must press that button, not skip to the next question
+    if (e.key === 'Enter' && e.target.closest?.('a[href], button:not(:disabled):not(.opt), textarea, select')) return;
     if (/^[1-4]$/.test(e.key) && !this.done) this.root.querySelectorAll('.opt')[+e.key - 1]?.click();
     if ((e.key === 'Enter' || e.key === 'ArrowRight') && this.done) { e.preventDefault(); this.next(); }
     if (e.key === 'h' && !this.done) this.hint();

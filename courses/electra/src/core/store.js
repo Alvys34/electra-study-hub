@@ -17,6 +17,13 @@ const blank = () => ({
 let state = load();
 const listeners = new Set();
 
+// Another tab saved: take its copy, so this tab's next save doesn't write back an old one over it.
+if (typeof window !== 'undefined') window.addEventListener('storage', e => {
+  if (e.key !== KEY) return;
+  state = load();
+  listeners.forEach(fn => fn(state));
+});
+
 function load() {
   let raw = null;
   try {

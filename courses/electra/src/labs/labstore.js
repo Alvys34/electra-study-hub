@@ -17,6 +17,13 @@ const blank = () => ({
 let state = load();
 const listeners = new Set();
 
+// Another tab saved: take its copy, so this tab's next save doesn't erase readings typed over there.
+if (typeof window !== 'undefined') window.addEventListener('storage', e => {
+  if (e.key !== KEY) return;
+  state = load();
+  emit('sync');
+});
+
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
@@ -58,24 +65,33 @@ export const labStore = {
     save(); emit('note');
   },
   notesFor(lab) { return state.notes[lab] || {}; },
-  clearLab(lab) { delete state.notes[lab]; delete state.units[lab]; delete state.guide[lab]; save(); emit('note'); },
+  clearLab(lab) {
+    delete state.notes[lab]; delete state.units[lab]; delete state.guide[lab];
+    if (state.last && (state.last.lab === lab || `lab${state.last.lab}` === lab)) state.last = null;
+    save(); emit('note');
+  },
 
   unit(lab, key, fallback) { return state.units[lab]?.[key] || fallback; },
   setUnit(lab, key, u) { state.units[lab] ||= {}; state.units[lab][key] = u; save(); emit('note'); },
 
   guide(lab) { return state.guide[lab] || { step: 0, seen: [] }; },
-  setGuideStep(lab, step) {
+  /** `num` is the lab number (6-9) that "Continue Lab N" links to; `lab` is the lab id the steps are saved under. */
+  setGuideStep(lab, step, num) {
     const g = state.guide[lab] || { step: 0, seen: [] };
     g.step = step;
     if (!g.seen.includes(step)) g.seen.push(step);
     state.guide[lab] = g;
-    state.last = { lab, view: 'guide' };
+    state.last = { lab: num ?? lab, view: 'guide' };
     save();
   },
 
   calcSrc(id, def = 'meas') { return state.calcSrc[id] || def; },
   setCalcSrc(id, src) { state.calcSrc[id] = src; save(); emit('note'); },
 
-  last() { return state.last; },
+  // older saves kept the guided lab as its id ('lab6'); links need the number
+  last() {
+    const l = state.last;
+    return l && typeof l.lab === 'string' && /^lab\d+$/.test(l.lab) ? { ...l, lab: Number(l.lab.slice(3)) } : l;
+  },
   setLast(lab, view) { state.last = { lab, view }; save(); },
 };

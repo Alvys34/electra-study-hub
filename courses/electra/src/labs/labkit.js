@@ -25,10 +25,13 @@ export const KIND = {
 
 export const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
-/** Parse what the student typed: "4.68", "4,68", " 12.02 ". Returns a number or null. */
+/** Parse what the student typed: "4.68", "4,68", " 12.02 ". Returns a number or null.
+ *  "1,234" is refused (null, shown in red): it could be 1.234 or 1234, and a wrong guess would store a wrong reading. */
 export function parseNum(s) {
   if (s == null) return null;
-  const t = String(s).trim().replace(',', '.');
+  const raw = String(s).trim();
+  if (/^[-+]?[1-9]\d{0,2},\d{3}$/.test(raw)) return null;
+  const t = raw.replace(',', '.');
   if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(t)) return null;
   const n = Number(t);
   return Number.isFinite(n) ? n : null;
