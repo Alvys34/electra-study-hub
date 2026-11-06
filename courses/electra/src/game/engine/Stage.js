@@ -105,7 +105,7 @@ export class Stage {
     const sign = this.canvasTexture(512, 128, (c, w, h) => {
       c.fillStyle = 'rgba(0,0,0,0)'; c.clearRect(0, 0, w, h);
       c.font = 'bold 76px "Space Grotesk", Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.shadowColor = '#facc15'; c.shadowBlur = 24; c.fillStyle = '#fde68a'; c.fillText('⚡ ELECTRA LAB', w / 2, h / 2);
+      c.shadowColor = '#facc15'; c.shadowBlur = 24; c.fillStyle = '#fde68a'; c.fillText('⚡ CIRCUIT LAB', w / 2, h / 2);
     });
     const signMesh = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.25), new THREE.MeshBasicMaterial({ map: sign, transparent: true }));
     signMesh.position.set(0, 6.4, -5.35); s.add(signMesh);

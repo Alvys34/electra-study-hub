@@ -269,6 +269,7 @@ export class LessonPage {
     const bar = this.root.querySelector('#lsBar');
     if (bar) bar.style.width = ((this.i + 0.35) / steps.length) * 100 + '%';
     this.state = { tasksDone: 0, answered: false, tries: 0 };
+    const solved = store.solvedSteps(this.key);
     const tasks = st.tasks || [];
     const kindBadge = st.kind === '3d'
       ? '<span class="ls-kind is3d">3D bench</span>'
@@ -283,7 +284,7 @@ export class LessonPage {
     const body = this.root.querySelector('#lsBody');
     body.innerHTML = `<div class="ls-do">
       ${readPrompt}
-      <div class="ls-steps" role="tablist" aria-label="Lesson steps">${steps.map((s, k) => `<button type="button" class="ls-step-dot ${k < this.i ? 'done' : k === this.i ? 'cur' : ''}" data-step="${k}" title="Step ${k + 1}: ${s.title.replace(/"/g, '&quot;')}"><i>${k < this.i ? '✓' : k + 1}</i></button>`).join('')}</div>
+      <div class="ls-steps" role="tablist" aria-label="Lesson steps">${steps.map((s, k) => `<button type="button" class="ls-step-dot ${k === this.i ? 'cur' : ''} ${solved.includes(k) ? 'done' : ''}" data-step="${k}" title="Step ${k + 1}: ${s.title.replace(/"/g, '&quot;')}"><i>${solved.includes(k) && k !== this.i ? '✓' : k + 1}</i></button>`).join('')}</div>
       <article class="ls-step ${enter}">
         <div class="ls-step-meta">
           <div class="ls-step-n">Step ${this.i + 1} of ${steps.length}</div>
@@ -331,6 +332,11 @@ export class LessonPage {
       inter.addEventListener('pointerdown', () => buddy.onBenchTouch('visual'), { passive: true });
       if (!tasks.length) this.tasksComplete(true);
     } else this.tasksComplete(true);
+    // already solved on an earlier visit: the student may redo it, but never has to
+    if (solved.includes(this.i)) {
+      const nx = this.root.querySelector('#lsNext');
+      if (nx?.disabled) { nx.disabled = false; this.say('✔ You solved this step before. Try it again, or press Continue.'); }
+    }
   }
 
   mount3d(inter, st) {
@@ -339,11 +345,12 @@ export class LessonPage {
       const tip = document.createElement('div'); tip.className = 'g-tip'; tip.hidden = true; document.body.appendChild(tip);
       const ui = {
         startLevel() {}, panel() {}, ask() {},
-        objectiveDone: i => this.taskDone(i),
-        levelComplete: () => this.tasksComplete(),
-        say: (t) => this.say(t),
+        // the bench is shared by every lesson visit, so its callbacks go to the page that owns it now
+        objectiveDone: i => bench.owner?.taskDone(i),
+        levelComplete: () => bench.owner?.tasksComplete(),
+        say: (t) => bench.owner?.say(t),
         tip: html => { if (!html) { tip.hidden = true; return; } tip.innerHTML = html; tip.hidden = false; },
-        hintBar: t => { const b = this.root.querySelector('.ls-hintbar'); if (b) { b.hidden = !t; if (t) b.innerHTML = hl(t); } },
+        hintBar: t => { const b = bench.owner?.root.querySelector('.ls-hintbar'); if (b) { b.hidden = !t; if (t) b.innerHTML = hl(t); } },
       };
       window.addEventListener('pointermove', e => { if (!tip.hidden) { tip.style.left = e.clientX + 16 + 'px'; tip.style.top = e.clientY + 16 + 'px'; } });
       el.innerHTML = `
@@ -358,6 +365,7 @@ export class LessonPage {
       window.__electraGame = game;
       bench = { el, game, ui };
     }
+    bench.owner = this;
     inter.appendChild(bench.el);
     bench.game.stage.paused = false;
     requestAnimationFrame(() => bench.game.stage.resize());
@@ -421,7 +429,7 @@ export class LessonPage {
       buddy.onTaskDone(st.title);
     }
     if (st.question) this.showQuestion(st.question);
-    else this.root.querySelector('#lsNext').disabled = false;
+    else this.unlock();
   }
 
   showQuestion(q0) {
@@ -456,7 +464,7 @@ export class LessonPage {
           giveXP(this.state.tries === 1 ? 10 : 5, chk);
           celebrateSmall(chk);
           buddy.onCorrect(this.state.tries);
-          this.root.querySelector('#lsNext').disabled = false;
+          this.unlock();
         } else {
           inp.classList.add('wrong'); setTimeout(() => inp.classList.remove('wrong'), 400);
           sfx.bad();
@@ -503,7 +511,7 @@ export class LessonPage {
         giveXP(this.state.tries === 1 ? 10 : 5, b);
         celebrateSmall(b);
         buddy.onCorrect(this.state.tries);
-        this.root.querySelector('#lsNext').disabled = false;
+        this.unlock();
       } else {
         b.disabled = true; b.classList.add('wrong'); sfx.bad();
         why.innerHTML = `<b class="no">Not quite.</b> Have another go.`;
@@ -511,6 +519,14 @@ export class LessonPage {
         buddy.onWrong();
       }
     });
+  }
+
+  /** The step is solved: remember it and let the student continue. */
+  unlock() {
+    store.markSolved(this.key, this.i);
+    const btn = this.root.querySelector('#lsNext');
+    if (btn) btn.disabled = false;
+    this.root.querySelector(`.ls-step-dot[data-step="${this.i}"]`)?.classList.add('done');
   }
 
   next() {

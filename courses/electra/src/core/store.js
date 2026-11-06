@@ -72,6 +72,17 @@ export const store = {
     save();
   },
 
+  /** Lab steps the student has actually solved (only ever grows), so going back never locks Continue again. */
+  solvedSteps(unit) { const s = state.learn[unit]?.solved; return Array.isArray(s) ? s : []; },
+  markSolved(unit, i) {
+    const cur = state.learn[unit] || { seen: 0, total: 0, done: false };
+    const s = Array.isArray(cur.solved) ? cur.solved : [];
+    if (s.includes(i)) return;
+    cur.solved = [...s, i];
+    state.learn[unit] = cur;
+    save();
+  },
+
   recordAnswer(unit, gen, correct, firstTry) {
     const p = state.practice[unit] || { tries: 0, right: 0, firstTry: 0 };
     p.tries++;

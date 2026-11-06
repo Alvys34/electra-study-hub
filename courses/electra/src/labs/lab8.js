@@ -45,7 +45,7 @@ const calcs = {
           mean: 'The bigger capacitor (C₁) takes the smaller share of the voltage.' },
         { rule: '<b>Theory for comparison</b>: the series total is smaller than either capacitor.', f: 'C<sub>T</sub> = [1/C₁ + 1/C₂]<sup>−1</sup>', s: '[1/100 µF + 1/47 µF]<sup>−1</sup>', r: 1 / (1 / v.C1 + 1 / v.C2), unit: 'µF' },
         { rule: '<b>Total voltage the pair reached</b> (from your two readings).', f: 'V<sub>C1</sub> + V<sub>C2</sub>', s: `${u4(v.V1, 'V')} + ${u4(v.V2, 'V')}`, r: tot, unit: 'V',
-          mean: 'Explanation: expect a little below 12 V. LED₁ stops conducting once the voltage left across it drops below its turn-on voltage (around 2 V), and the meter drains a little charge while you measure.' },
+          mean: 'Explanation: expect it to come out below 12 V, roughly 12 V minus LED₁’s turn-on voltage (about 2 V for a red LED). LED₁ stops conducting once the voltage left across it drops below that, and the meter drains a little charge while you measure.' },
       ];
     },
   },

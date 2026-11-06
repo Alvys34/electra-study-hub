@@ -70,7 +70,7 @@ checks.dV2pp = ['th', 'V2pp'];
 checks.dth = ['th', 'th'];
 void inv;
 
-const v4 = (x, u) => (x == null ? '?' : `${Number((x / ({ Hz: 1, kHz: 1e3, Ω: 1, 'µF': 1e-6, V: 1, rad: 1 }[u] ?? 1)).toPrecision(4))} ${u}`);
+const v4 = (x, u) => (x == null ? '?' : `${Number((x / ({ Hz: 1, kHz: 1e3, Ω: 1, 'µF': 1e-6, V: 1, 'rad/s': 1 }[u] ?? 1)).toPrecision(4))} ${u}`);
 
 const calcs = {
   tau: {
@@ -89,8 +89,8 @@ const calcs = {
     steps: v => {
       const w = 2 * Math.PI * v.f, Xc = 1 / (w * v.C), Z = Math.hypot(v.R, Xc), Vspp = 2 * v.Vsp;
       return [
-        { rule: '<b>Angular frequency</b>.', f: 'ω = 2π f', s: `2π × ${v4(v.f, 'Hz')}`, r: w, unit: '', mean: 'In rad/s.' },
-        { rule: '<b>Capacitive reactance</b>: the capacitor’s “AC resistance” at this frequency.', f: 'X<sub>C</sub> = 1 / (ωC)', s: `1 / (${v4(w, 'rad')} × ${v4(v.C, 'µF')})`, r: Xc, unit: 'Ω', mean: 'At 1.6 kHz, X<sub>C</sub> comes out almost equal to R. That is why the phase shift lands near 45°.' },
+        { rule: '<b>Angular frequency</b>.', f: 'ω = 2π f', s: `2π × ${v4(v.f, 'Hz')}`, r: w, unit: 'rad/s' },
+        { rule: '<b>Capacitive reactance</b>: the capacitor’s “AC resistance” at this frequency.', f: 'X<sub>C</sub> = 1 / (ωC)', s: `1 / (${v4(w, 'rad/s')} × ${v4(v.C, 'µF')})`, r: Xc, unit: 'Ω', mean: 'At 1.6 kHz, X<sub>C</sub> comes out almost equal to R. That is why the phase shift lands near 45°.' },
         { rule: '<b>Impedance magnitude</b>. R and X<sub>C</sub> are 90° apart, so they combine like the sides of a right triangle.', f: '|Z| = √(R² + X<sub>C</sub>²)', s: `√(${v4(v.R, 'Ω')}² + ${v4(Xc, 'Ω')}²)`, r: Z, unit: 'Ω' },
         { id: 'V2pp', rule: '<b>Voltage divider</b>: the capacitor gets its share X<sub>C</sub>/|Z| of the source.', f: 'V<sub>C,pp</sub> = V<sub>s,pp</sub> × X<sub>C</sub> / |Z|', s: `${v4(Vspp, 'V')} × ${v4(Xc, 'Ω')} / ${v4(Z, 'Ω')}`, r: Vspp * Xc / Z, unit: 'V' },
         { id: 'th', rule: '<b>Phase</b>: the capacitor voltage <b>lags</b> the source.', f: 'θ = −tan<sup>−1</sup>(R / X<sub>C</sub>)', s: `−tan<sup>−1</sup>(${v4(v.R, 'Ω')} / ${v4(Xc, 'Ω')})`, r: -Math.atan(v.R / Xc) * 180 / Math.PI, unit: '°',

@@ -80,7 +80,7 @@
 .ls-toc a.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--panel)); color: #fff; font-weight: 700; }
 .ls-toc a.active span { background: var(--accent); color: #04121f; }
 
-.ls-sheet { display: grid; gap: 18px; margin-top: 18px; }
+.ls-sheet { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; margin-top: 18px; }
 .ls-sec {
   position: relative; padding: 26px 28px; border-radius: 22px;
   background: linear-gradient(180deg, rgba(21, 31, 56, .94), rgba(14, 21, 40, .97));
@@ -210,8 +210,9 @@
   box-shadow: inset 0 2px 12px rgba(0,0,0,.4);
 }
 .ls-callouts { display: grid; gap: 12px; margin-top: 16px; }
-.ls-callouts.two { grid-template-columns: 1fr 1fr; }
-@media (max-width: 720px) { .ls-callouts.two { grid-template-columns: 1fr; } }
+.ls-callouts.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 720px) { .ls-callouts.two { grid-template-columns: minmax(0, 1fr); } }
+.ls-text ul > li, .ls-callouts > * { min-width: 0; }
 .ls-key, .ls-exam {
   padding: 14px 16px; border-radius: 15px;
   font-size: var(--fs-ui); line-height: 1.58;
@@ -256,6 +257,7 @@
 
 @media (max-width: 640px) {
   .ls-head { flex-wrap: wrap; padding: 10px 12px; }
+  .ls-title { flex: 1 1 160px; }
   .ls-sec { padding: 20px 16px; }
   .ls-intro { padding: 20px 18px; }
   .ls-tab { padding: 7px 10px; font-size: var(--fs-small); }

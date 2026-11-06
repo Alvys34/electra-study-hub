@@ -13,11 +13,11 @@ export function kcl(root, nb) {
     const T = g(total[0]);
     const ok = vals.every(v => v != null) && T != null;
     const sum = ok ? vals.reduce((a, b) => a + b, 0) : null;
-    const d = ok && T ? ((sum - T) / T) * 100 : null;
+    const d = ok && T ? ((sum - T) / T) * 100 : null;  // T = 0 has no percentage
     return `<div class="kc ${ok ? '' : 'wait'}"><b>${title}</b>
       <div class="eq">${parts.map(([k, l]) => `${l} (${fmt(g(k), unit)})`).join(' + ')} = ${ok ? `<b>${fmt(sum, unit)}</b>` : '…'}
       &nbsp;vs&nbsp; ${total[1]} = ${fmt(T, unit)}</div>
-      ${ok ? `<div class="mean">Off by ${Math.abs(d).toFixed(1)}%</div>` : '<div class="mean">Fill in the measured column to see this.</div>'}</div>`;
+      ${ok ? `<div class="mean">${d == null ? 'Off by —' : `Off by ${Math.abs(d).toFixed(1)}%`}</div>` : '<div class="mean">Fill in the measured column to see this.</div>'}</div>`;
   };
   root.innerHTML = `<div class="kcl"><h4>Your measured numbers, summed</h4>
     ${row('Figure 4 · KCL at the R₂/R₃ junction', [['p1I2m', 'I<sub>R2</sub>'], ['p1I3m', 'I<sub>R3</sub>']], ['p1ITm', 'I<sub>T</sub>'], 'mA')}
@@ -79,7 +79,8 @@ export function ohmsim(root, env) {
     msg.innerHTML = tOL > 120 ? `Would take about <b>${Math.round(tOL / 60)} min</b> to reach OL. Too slow: try a <b>lower</b> range.`
       : tOL < 0.05 ? `Over in about <b>${fmt(tOL, tOL < 1e-3 ? 'µs' : 'ms')}</b>: you’d only see a flicker, or nothing. Use the <b>highest</b> range.`
         : `Climbs to OL in about <b>${tOL < 1 ? fmt(tOL, 'ms') : tOL.toFixed(1) + ' s'}</b>: easy to watch.`;
-    if (tOL > 120 || tOL < 0.05 || !env.motion()) { show(tOL < 0.05 ? 'OL' : tOL > 120 ? '0.000' : 'OL'); return; }
+    // very slow charges still animate (the number creeps up); with motion off, show where it ends up
+    if (tOL < 0.05 || !env.motion()) { show(tOL > 120 ? '↑ slow' : 'OL'); return; }
     t0 = performance.now();
     const tick = now => {
       const t = (now - t0) / 1000, R = Rm * (Math.exp(t / tau) - 1);
