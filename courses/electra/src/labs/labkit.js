@@ -9,7 +9,7 @@ import { labStore } from './labstore.js';
 export const SCALE = {
   'Ω': 1, 'kΩ': 1e3, 'V': 1, 'mV': 1e-3, 'A': 1, 'mA': 1e-3, 'W': 1, 'mW': 1e-3,
   'F': 1, 'µF': 1e-6, 'C': 1, 'mC': 1e-3, 'µC': 1e-6,
-  's': 1, 'ms': 1e-3, 'µs': 1e-6, 'Hz': 1, 'kHz': 1e3, '°': 1, 'div': 1, '': 1,
+  's': 1, 'ms': 1e-3, 'µs': 1e-6, 'Hz': 1, 'kHz': 1e3, '°': 1, 'rad/s': 1, 'div': 1, '': 1,
   's/div': 1, 'ms/div': 1e-3, 'µs/div': 1e-6, 'V/div': 1, 'mV/div': 1e-3,
 };
 
@@ -42,7 +42,8 @@ export function fmt(x, unit = '', sig = 4) {
   if (v === 0) s = '0';
   else if (Math.abs(v) >= 1e5 || Math.abs(v) < 1e-3) s = v.toExponential(sig - 1).replace('e', '×10^');
   else s = Number(v.toPrecision(sig)).toString();
-  return unit ? `${s} ${unit}` : s;
+  s = s.replace(/^-/, '−');
+  return unit === '°' ? `${s}°` : unit ? `${s} ${unit}` : s;
 }
 
 export class Notebook {

@@ -214,7 +214,7 @@ export default {
       observe: 'Something close to 12 V. Type exactly what the meter shows.',
       why: 'The supply’s own display can be off by a little. Your calculations should use what actually reaches the circuit.' },
     { part: 'Part 1 · Step 6', title: 'Calculate Figure 4', fig: 'part1', figStage: 1, calc: 'p1', fields: ['p1R23', 'p1RTc', 'p1ITc', 'p1V1c', 'p1V23c', 'p1V4c', 'p1I2c', 'p1I3c'],
-      do: 'Work through steps a to d on paper or a calculator, using <b>your</b> Table 1 values and V<sub>s</sub>. Type each result.',
+      do: 'Work through the steps on paper or a calculator, using <b>your</b> Table 1 values and V<sub>s</sub>. Type each result.',
       observe: 'A ✓ next to each value means it matches the working shown here.',
       why: 'R₂ ∥ R₃ is replaced by one resistor, leaving a plain series loop. Ohm’s law on the loop gives I<sub>T</sub>, and I<sub>T</sub> gives each drop.',
       hint: 'Keep the units straight: V ÷ kΩ = mA. If I<sub>T</sub> comes out in the thousands, you divided by ohms instead of kilohms.' },
