@@ -1,4 +1,4 @@
-// Home.js - Unified mission map: all 10 units (Read + Do + Practice), quick drills, and Free 3D Lab.
+// Home.js - Unified mission map: all 10 units (Read + Do + Practice), quick drills, in-class Labs 6-9 and Free 3D Lab.
 import { UNITS } from '../core/units.js';
 import { LESSONS_V2 } from '../lesson/LessonPage.js';
 import { store, levelFor, levelName } from '../core/store.js';
@@ -89,6 +89,15 @@ export class Home {
           <small>${missed ? `${missed} waiting` : 'All caught up'}</small>
         </a>
       </section>
+
+      <a class="bench-cta labs-cta" href="#/labs">
+        <div class="bench-cta-icon">🧪</div>
+        <div class="bench-cta-body">
+          <h3>In-class labs 6–9</h3>
+          <p>Combination circuits, Multisim and wye-delta, RC circuits, and the AC response of RC circuits. Read each lesson before class, then follow the guided steps on your phone at the bench.</p>
+        </div>
+        <span class="bench-cta-btn">Open labs →</span>
+      </a>
 
       <section class="map">
         <div class="map-head">

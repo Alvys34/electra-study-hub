@@ -1,4 +1,5 @@
-﻿// main.js - app shell + router: Home (#/), Read+Do Lessons (#/lesson/<unit>), Practice (#/practice/<unit>), Free 3D Lab (#/lab).
+﻿// main.js - app shell + router: Home (#/), Read+Do Lessons (#/lesson/<unit>), Practice (#/practice/<unit>), Free 3D Lab (#/lab),
+// in-class Labs 6-9 (#/labs, #/labs/<n>, #/labs/<n>/guide).
 import './app.css';
 import './game.css';
 import './lesson.css';
@@ -6,6 +7,7 @@ import { Home, renderTopbar } from './ui/Home.js';
 import { PracticeSession } from './practice/PracticeSession.js';
 import { LessonPage, LESSONS_V2 } from './lesson/LessonPage.js';
 import { FreeLab } from './lab/FreeLab.js';
+import { LabsPage } from './labs/LabsPage.js';
 import { UNITS } from './core/units.js';
 import { store } from './core/store.js';
 import { toast, sfx, burst } from './core/fx.js';
@@ -33,7 +35,9 @@ function route(force = false) {
   window.scrollTo(0, 0);
   shell.dataset.view = kind || 'home';
 
-  if (kind === 'lab') {
+  if (kind === 'labs') {
+    current = new LabsPage(view, arg, sub, nav);
+  } else if (kind === 'lab') {
     current = new FreeLab(view, nav);
   } else if (kind === 'lesson' && LESSONS_V2[arg]) {
     current = new LessonPage(view, arg, sub, nav);

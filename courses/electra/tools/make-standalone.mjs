@@ -1,5 +1,5 @@
-// make-standalone.mjs - builds Electra into ONE offline HTML file (code, styles, sprite and fonts inlined)
-// at release/Electra/Open Electra.html. Usage (from the repo root): npm run standalone:electra
+// make-standalone.mjs - builds Circuit Analysis into ONE offline HTML file (code, styles, sprite and fonts inlined)
+// at release/Circuit Analysis/Open Circuit Analysis.html. Usage (from the repo root): npm run standalone:electra
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -8,8 +8,8 @@ import { build } from 'vite';
 const course = path.resolve(import.meta.dirname, '..');
 const repo = path.resolve(course, '..', '..');
 const dist = fs.mkdtempSync(path.join(os.tmpdir(), 'electra-'));
-const outDir = path.join(repo, 'release', 'Electra');
-const outHtml = path.join(outDir, 'Open Electra.html');
+const outDir = path.join(repo, 'release', 'Circuit Analysis');
+const outHtml = path.join(outDir, 'Open Circuit Analysis.html');
 
 // A huge assetsInlineLimit turns the sprite sheet into a data: URL inside the CSS.
 process.env.VITE_STANDALONE = '1';

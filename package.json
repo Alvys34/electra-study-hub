@@ -1,12 +1,12 @@
 {
   "name": "electra-study-hub",
   "version": "1.0.0",
-  "description": "Mechanical Technician Study Hub: interactive courses (Circuit Analysis, Blueprint Reading & Metrology).",
+  "description": "Mechanical & CNC Study Hub: interactive courses (Circuit Analysis, Blueprint Reading & Metrology).",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"courses/metrology/tests/*.test.js\"",
+    "test": "node --test \"courses/metrology/tests/*.test.js\" \"courses/electra/tests/*.test.js\"",
     "standalone:electra": "node courses/electra/tools/make-standalone.mjs"
   },
   "dependencies": {

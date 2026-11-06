@@ -1,10 +1,10 @@
-# Mechanical Technician Study Hub
+# Mechanical & CNC Study Hub
 
 A home page of interactive courses. Each course is its own app in `courses/<id>/`, and the hub page lists them all.
 
 | Course | Folder | What it covers |
 |---|---|---|
-| ⚡ Circuit Analysis | `courses/electra/` | EMNG1001: 10 units with study sheets, hands-on 3D bench steps, practice and a free 3D lab |
+| ⚡ Circuit Analysis | `courses/electra/` | EMNG1001: 10 units with study sheets, hands-on 3D bench steps, practice and a free 3D lab, plus in-class Labs 6–9 (lesson + guided mode) |
 | 📐 Blueprint Reading & Metrology | `courses/metrology/` | CRN-20405: rules, conversions, calipers, micrometers, height gage and protractors, with movable instruments, a 10-problem lab per module, and shop projects 1–9 (measure a random part on a drawing) |
 
 ## Run it
@@ -19,7 +19,7 @@ On Windows you can double-click `Start-Hub.bat` instead.
 ## Test it
 
 ```
-npm test         # lab progression, answer parsing and every instrument's step-by-step maths
+npm test         # metrology labs and instruments, and the Circuit Analysis Labs 6–9 content and theory numbers
 ```
 
 ## Publish it
@@ -31,8 +31,8 @@ Turn it on once in the repo: **Settings → Pages → Source: GitHub Actions**.
 
 ## Offline copy
 
-`npm run standalone:electra` writes `release/Electra/Open Electra.html` (Circuit Analysis), a single file with everything inlined
-that opens without a server or internet.
+`npm run standalone:electra` writes `release/Circuit Analysis/Open Circuit Analysis.html` (Circuit Analysis), a single file with everything inlined
+that opens without a server or internet. It includes Labs 6–9; double-click it, or copy it to a phone.
 
 ## Layout
 
