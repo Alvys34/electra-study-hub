@@ -7,7 +7,7 @@ export const COURSES = [
     icon: '⚡',
     title: 'Circuit Analysis',
     subject: 'EMNG1001',
-    blurb: 'Units, resistors, Ohm’s law, series and parallel circuits, power and atomic theory, with a 3D workbench to wire and measure real circuits.',
+    blurb: 'Units, resistors, Ohm’s law, series and parallel circuits, power and atomic theory, with a 3D workbench to wire and measure real circuits, and guided in-class Labs 6–9.',
     units: 10,
     progressKey: 'electra.progress.v2',
   },

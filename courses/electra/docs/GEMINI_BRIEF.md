@@ -1,6 +1,6 @@
-# Electra: brief for the next build
+# Circuit Analysis: brief for the next build
 
-You're picking up **Electra**, a study app for the college course **EMNG1001 Circuit Analysis**. It's for one
+You're picking up **Circuit Analysis**, a study app for the college course **EMNG1001 Circuit Analysis**. It's for one
 student who has ADHD and gets bored easily. He tested **Unit 2A** in its current form and loved it. Your job is to
 roll that format out to the rest of the course, clean up the app, and turn the old game levels into a free 3D lab.
 
@@ -19,7 +19,7 @@ Read this whole file before changing anything, then read `docs/LESSON_AUTHORING.
 | Old quick-read cards + mini-widgets | `src/learn/` | ⚠️ Superseded by lessons. **Retire** once every unit has a new lesson, but port useful widgets first (see `docs/LESSON_AUTHORING.md` §6). |
 | Old Gemini 3D scenes | `src/modules/`, `src/three/`, `src/ui/StudyHUD.js`, route `#/lab/<unit>` | ⚠️ Retire. The Free Lab replaces them. `ComponentModels.createBohrAtom` is worth salvaging for 4B. |
 | Course content | `curriculum_overview.md` (all slide text), `curriculum/*.pptx` (original decks with images) | Source of truth for every lesson. |
-| Launcher | `Start-Electra.bat` (runs `npm run dev -- --open`) | Keep working. |
+| Launcher | `Start-Hub.bat` (runs `npm run dev -- --open`) | Keep working. |
 
 ---
 
@@ -140,7 +140,7 @@ General polish:
   If you change the shape, migrate old data instead of wiping it.
 - No new frameworks. It's plain ES modules + Vite + three.js. Keep it that way.
 - Run `npm run build` before you finish. It must build with no errors.
-- Test like the student would: run `Start-Electra.bat`, start from the home screen, and play every new lesson to the
+- Test like the student would: run `Start-Hub.bat`, start from the home screen, and play every new lesson to the
   end with mouse only.
 
 ## 7. Done means

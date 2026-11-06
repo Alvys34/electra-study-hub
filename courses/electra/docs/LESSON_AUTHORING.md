@@ -1,4 +1,4 @@
-# How to write an Electra lesson
+# How to write a Circuit Analysis lesson
 
 Unit 2A (`src/lesson/unit2a.js`) is the approved reference. **Open it side by side with this guide.** Every new
 unit is one data file in the same shape. The page (`LessonPage.js`) does all the rendering, so you mostly write

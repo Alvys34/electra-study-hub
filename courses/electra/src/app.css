@@ -1,4 +1,4 @@
-﻿/* app.css - Electra learning shell (Home / Lessons / Practice). */
+﻿/* app.css - Circuit Analysis learning shell (Home / Lessons / Practice). */
 :root {
   --bg: #0a0f1e;
   --bg-2: #0f1629;
@@ -895,3 +895,10 @@ sub { font-size: .7em; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* in-class labs card on the course home (blue twin of the bench card) */
+.labs-cta { margin-top: 16px; border-color: rgba(56, 189, 248, .55);
+  background: radial-gradient(500px 220px at 12% 50%, rgba(56, 189, 248, .16), transparent 70%), linear-gradient(135deg, rgba(24, 42, 78, .96), rgba(13, 23, 46, .98)); }
+.labs-cta:hover { border-color: #7dd3fc; box-shadow: 0 24px 60px rgba(0, 0, 0, .55), 0 0 40px rgba(56, 189, 248, .24); }
+.labs-cta .bench-cta-icon { background: linear-gradient(135deg, rgba(56, 189, 248, .22), rgba(14, 116, 144, .12)); border-color: rgba(56, 189, 248, .45); }
+.labs-cta .bench-cta-btn { background: linear-gradient(135deg, #7dd3fc, #0ea5e9); }

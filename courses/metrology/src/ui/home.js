@@ -23,7 +23,7 @@ export function renderHome(view) {
     </a>`;
   };
   view.innerHTML = `<header class="home-head">
-      <p class="crumbs"><a href="../../">Mechanical Technician Study Hub</a></p>
+      <p class="crumbs"><a href="../../">Mechanical &amp; CNC Study Hub</a></p>
       <h1 class="page-title">Blueprint Reading &amp; Metrology</h1>
       <p class="lede">Read every measuring tool in the shop: rules, calipers, micrometers, height gages and protractors. Each module has a short read, instruments you can move, worked examples and a 10-problem lab.</p>
     </header>
