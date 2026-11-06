@@ -57,8 +57,8 @@ export function parseAnswer(raw, fixedUnit = null) {
   let s = String(raw).trim().replace(/\s+/g, ' ');
   if (!s) return NaN;
   s = s.replace(/−/g, '-').replace(/×/g, 'x');
-  // remove thousands separators like 12,000 (but keep decimals)
-  if (/^\-?\d{1,3}(,\d{3})+(\.\d+)?/.test(s)) s = s.replace(/,/g, '');
+  // remove thousands separators like 12,000 (but keep decimals; "0,250" is a decimal comma, not 250)
+  if (/^\-?[1-9]\d{0,2}(,\d{3})+(\.\d+)?/.test(s)) s = s.replace(/,/g, '');
   else s = s.replace(',', '.');
 
   if (fixedUnit) {

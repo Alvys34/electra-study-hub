@@ -229,6 +229,13 @@ export const GLOSSARY = [
     eq: '0 Blk · 1 Brn · 2 Red · 3 Org · 4 Yel · 5 Grn · 6 Blu · 7 Vio · 8 Gry · 9 Wht',
   },
   {
+    keys: ['gold', 'silver', 'gold band', 'silver band'],
+    title: 'Gold & Silver Bands',
+    tag: 'Unit 1B · Colour Code',
+    def: 'The two metallic colours on a resistor. As the 3rd band (multiplier) gold means ×0.1 and silver ×0.01. As the 4th band (tolerance) gold means ±5% and silver ±10%.',
+    eq: 'Gold: ×0.1 or ±5% · Silver: ×0.01 or ±10%',
+  },
+  {
     keys: ['tolerance', '±5%', '±10%', '±20%', 'minimum resistance', 'maximum resistance'],
     title: 'Resistor Tolerance',
     tag: 'Unit 1B · Specification',
@@ -570,7 +577,7 @@ export const GLOSSARY = [
     eq: 'Lose e⁻ → Positive Ion (+) · Gain e⁻ → Negative Ion (−)',
   },
   {
-    keys: ['conductor', 'conductors', 'copper', 'silver', 'gold', 'aluminum'],
+    keys: ['conductor', 'conductors', 'copper', 'aluminum'],
     title: 'Conductor (1–3 Valence Electrons)',
     tag: 'Unit 4B · Material Category',
     def: 'A material with 1 to 3 valence electrons and no energy gap, so room-temperature electrons move freely. The best conductors (silver, copper, gold) have 1 valence electron. Aluminum is also a conductor and has 3.',

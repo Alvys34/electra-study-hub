@@ -250,7 +250,12 @@ export class Stage {
   dispose() {
     cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.resize);
+    this.controls.dispose();
+    disposeDeep(this.scene);
+    this.scene.environment?.dispose?.();
     this.renderer.dispose();
+    // Give the WebGL context back now: browsers allow ~16, and the oldest one lost is the lesson bench's.
+    this.renderer.forceContextLoss();
     this.host.innerHTML = '';
   }
 }

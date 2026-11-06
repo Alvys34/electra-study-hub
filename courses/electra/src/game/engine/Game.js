@@ -55,6 +55,7 @@ export class Game {
   }
 
   unload() {
+    clearTimeout(this.completeT);
     this.cancel();
     this.stage.clearLevel();
     this.parts = []; this.wires = []; this.handlers = {};
@@ -335,7 +336,13 @@ export class Game {
       if (o.camera) this.stage.tweenCamera(o.camera.pos, o.camera.target);
       o.onDone?.(this, this.st);
     }
-    if (this.objIdx >= objs.length) { this.done = true; setTimeout(() => this.ui.levelComplete(this), 900); }
+    if (this.objIdx >= objs.length) {
+      this.done = true;
+      // only for the level that was finished: the student may have moved to another step in the meantime
+      const lvl = this.level;
+      clearTimeout(this.completeT);
+      this.completeT = setTimeout(() => { if (this.level === lvl) this.ui.levelComplete(this); }, 900);
+    }
   }
 
   on(ev, fn) { (this.handlers[ev] ||= []).push(fn); }

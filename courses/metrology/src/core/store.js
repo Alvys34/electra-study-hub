@@ -12,6 +12,11 @@ function load() {
 
 let data = load();
 
+// Another tab saved: take its copy, so this tab's next save doesn't write back an old one over it.
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', e => { if (e.key === KEY) data = load(); });
+}
+
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { /* private mode: progress lasts until the tab closes */ }
 }

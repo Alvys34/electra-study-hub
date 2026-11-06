@@ -190,7 +190,8 @@ export class Home {
         </div>`;
       }).join('')}</div></div>`;
     document.body.appendChild(m);
-    const close = () => { m.remove(); window.removeEventListener('keydown', esc); };
+    const close = () => { m.remove(); window.removeEventListener('keydown', esc); this.closeSheets = null; };
+    this.closeSheets = close;
     const esc = e => { if (e.key === 'Escape') close(); };
     window.addEventListener('keydown', esc);
     m.addEventListener('click', e => { if (e.target === m) close(); });
@@ -198,7 +199,8 @@ export class Home {
     m.querySelector('#mx').onclick = close;
   }
 
-  unmount() {}
+  // browser Back while the cheat sheets are open: close them with the page
+  unmount() { this.closeSheets?.(); }
 }
 
 export function renderTopbar(el) {

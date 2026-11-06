@@ -299,7 +299,10 @@ export class Bench {
   }
 
   dispose() {
-    cancelAnimationFrame(this.raf); this.ro.disconnect(); this.controls.dispose(); this.renderer.dispose();
+    cancelAnimationFrame(this.raf); this.ro.disconnect(); this.controls.dispose();
+    this.scene.traverse(o => { o.geometry?.dispose?.(); (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { m?.map?.dispose?.(); m?.dispose?.(); }); });
+    this.scene.environment?.dispose?.();
+    this.renderer.dispose(); this.renderer.forceContextLoss();
     this.renderer.domElement.remove();
   }
 }

@@ -1,40 +1,73 @@
-/* hub.css - same dark theme tokens as the Circuit Analysis course (courses/electra/src/app.css :root). */
+/* hub.css - the hub reads like a drawing sheet: the same drafting grid and tokens as the Metrology course
+   (courses/metrology/src/app.css :root), and each course is laid out as a drawing title block, the box every
+   print in the shop has in its corner. Follows the device's light or dark setting. */
 :root {
-  --bg: #0a0f1e; --panel: #131c33; --panel-2: #1a2540; --line: #27345a;
-  --ink: #eef2ff; --ink-2: #b8c3df; --ink-3: #7d8bb0; --accent: #38bdf8; --bolt: #facc15;
+  --bg: #0d1620; --grid: rgba(110, 170, 225, .055);
+  --surface: #15212d; --surface-2: #1b2a39; --line: #2a3b4e; --frame: #4a5d72;
+  --ink: #e7edf4; --ink-2: #a8b6c5; --ink-3: #8394a6;
+  --accent: #4cc3e0; --accent-ink: #06222b;
   --display: "Space Grotesk", system-ui, sans-serif; --body: "DM Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f3f1ec; --grid: rgba(40, 90, 140, .06);
+    --surface: #ffffff; --surface-2: #f6f5f1; --line: #dcd8cf; --frame: #8b8a84;
+    --ink: #17212b; --ink-2: #47566a; --ink-3: #5f6d7d;
+    --accent: #0e86a6; --accent-ink: #ffffff;
+    color-scheme: light;
+  }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 body {
-  min-height: 100vh; font-family: var(--body); color: var(--ink);
-  background: radial-gradient(1200px 600px at 85% -10%, #38bdf81a, transparent 60%), radial-gradient(900px 500px at -10% 110%, #a78bfa1a, transparent 60%), var(--bg);
+  min-height: 100vh; font-family: var(--body); color: var(--ink); line-height: 1.5;
+  background-color: var(--bg);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 a { color: inherit; text-decoration: none; }
 #hub { max-width: 880px; margin: 0 auto; padding: 56px 20px 80px; }
-.hub-head h1 { font-family: var(--display); font-size: 42px; letter-spacing: -.02em; }
-.hub-head p { margin-top: 8px; color: var(--ink-2); font-size: 16.5px; }
-.courses { display: grid; gap: 16px; margin-top: 32px; }
-.course {
-  display: flex; align-items: center; gap: 18px; padding: 22px; border-radius: 18px;
-  background: var(--panel); border: 1px solid var(--line); transition: transform .15s, border-color .15s;
+
+.eyebrow, .cell small { font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.hub-head h1 { font-family: var(--display); font-size: 40px; line-height: 1.1; letter-spacing: -.02em; margin-top: 6px; }
+.hub-head .lede { margin-top: 8px; color: var(--ink-2); font-size: 16px; }
+
+.courses { display: grid; gap: 24px; margin-top: 32px; }
+
+/* Title block: a thick outer frame, thin inner rules, small caps labels in each cell. */
+.tblock { background: var(--surface); border: 2px solid var(--frame); }
+.cell { display: grid; align-content: start; gap: 2px; padding: 10px 14px; min-width: 0; }
+.cell b { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+.tb-head { display: grid; grid-template-columns: 150px 1fr; border-bottom: 1px solid var(--line); }
+.tb-head .cell + .cell { border-left: 1px solid var(--line); }
+.cell-code b { color: var(--accent); font-size: 16px; }
+.cell-title strong { font-family: var(--display); font-size: 24px; line-height: 1.2; font-weight: 700; }
+.tb-blurb { color: var(--ink-2); font-size: 15px; margin-top: 4px; }
+.tb-head:hover .cell-title strong, .tb-head:focus-visible .cell-title strong { color: var(--accent); }
+.tb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.tb-stats .cell + .cell { border-left: 1px solid var(--line); }
+.tb-go { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 10px 16px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 700; font-size: 15px;
+  transition: border-color .15s, background-color .15s;
 }
-.course:hover, .course:focus-visible { transform: translateY(-2px); border-color: var(--accent); outline: none; }
-.course-icon {
-  flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; font-size: 26px;
-  background: linear-gradient(135deg, #fde047, #f59e0b); color: #111; box-shadow: 0 0 22px rgba(250, 204, 21, .35);
-}
-.course-body { display: grid; gap: 4px; flex: 1; min-width: 0; }
-.course-subject { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .05em; color: var(--accent); }
-.course-title { font-family: var(--display); font-size: 24px; font-weight: 700; }
-.course-blurb { color: var(--ink-2); font-size: 15px; line-height: 1.5; }
-.course-meta { color: var(--ink-3); font-size: 13.5px; margin-top: 4px; }
-.course-meta b { color: var(--bolt); }
-.course-go { flex: none; font-size: 22px; color: var(--ink-3); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: color-mix(in srgb, var(--accent) 86%, var(--ink)); }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
 @media (max-width: 560px) {
   #hub { padding-top: 32px; }
-  .hub-head h1 { font-size: 32px; }
-  .course { align-items: flex-start; padding: 18px; }
-  .course-icon { width: 44px; height: 44px; font-size: 20px; }
-  .course-go { display: none; }
+  .hub-head h1 { font-size: 30px; }
+  .tb-head { grid-template-columns: 1fr; }
+  .tb-head .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+  .cell-code { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 14px; }
+  .cell-title strong { font-size: 21px; }
+  .tb-stats { grid-template-columns: 1fr; }
+  .tb-stats .cell { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 14px; }
+  .tb-stats .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+  .tb-go .btn { flex: 1 1 100%; justify-content: center; }
 }
-@media (prefers-reduced-motion: reduce) { .course { transition: none; } .course:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }

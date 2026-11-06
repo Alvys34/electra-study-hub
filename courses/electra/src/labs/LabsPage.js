@@ -165,7 +165,7 @@ export class LabsPage {
   guideHTML() {
     const L = this.lab, n = L.guide.length;
     let i = Math.max(0, Math.min(n - 1, labStore.guide(L.id).step || 0));
-    labStore.setGuideStep(L.id, i);
+    labStore.setGuideStep(L.id, i, L.num);
     const st = L.guide[i];
     const blk = (cls, title, html) => (html ? `<div class="gblk ${cls}"><h3>${title}</h3><p>${html}</p></div>` : '');
     const extras = [
@@ -293,7 +293,11 @@ export class LabsPage {
       if (!t.dataset?.key || t.tagName === 'BUTTON') return;
       labStore.setNote(this.lab.id, t.dataset.key, t.value);
       r.querySelectorAll(`[data-key="${t.dataset.key}"]`).forEach(o => { if (o !== t && o.tagName !== 'BUTTON') o.value = t.value; });
-      if (t.tagName === 'INPUT') t.classList.toggle('bad', t.value.trim() !== '' && parseNum(t.value) == null);
+      if (t.tagName === 'INPUT') {
+        const bad = t.value.trim() !== '' && parseNum(t.value) == null;
+        t.classList.toggle('bad', bad);
+        if (bad) t.title = 'Type a plain number with a dot for decimals, e.g. 1.234 or 1234'; else t.removeAttribute('title');
+      }
       this.refresh();
     }, opt);
     r.addEventListener('change', e => {
@@ -312,7 +316,7 @@ export class LabsPage {
       if (act === 'motion') return labStore.toggleMotion();
       if (act === 'prev' || act === 'next') {
         const g = labStore.guide(this.lab.id);
-        labStore.setGuideStep(this.lab.id, Math.max(0, Math.min(this.lab.guide.length - 1, g.step + (act === 'next' ? 1 : -1))));
+        labStore.setGuideStep(this.lab.id, Math.max(0, Math.min(this.lab.guide.length - 1, g.step + (act === 'next' ? 1 : -1))), this.lab.num);
         this.render(); window.scrollTo(0, 0);
         return;
       }

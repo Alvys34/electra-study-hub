@@ -251,6 +251,8 @@ export class LessonPage {
 
   onKey(e) {
     if (e.target.matches('input')) return;
+    // Enter on a focused button or link must press that one (Back, the map link), not Continue
+    if (e.key === 'Enter' && e.target.closest?.('a[href], button:not(:disabled):not(.ls-opt), textarea, select')) return;
     if (e.key === 'Enter') { const c = this.root.querySelector('#lsNext'); if (c && !c.disabled) { e.preventDefault(); c.click(); } }
     if (/^[1-4]$/.test(e.key)) this.root.querySelectorAll('.ls-opt:not(:disabled)')[+e.key - 1]?.click();
   }
@@ -536,7 +538,7 @@ export class LessonPage {
 
   finish() {
     this.cleanupStep?.();
-    if (bench) { bench.game.unload(); bench.el.remove(); }
+    if (bench) { bench.game.unload(); bench.game.stage.paused = true; bench.el.remove(); }
     store.setLearn(this.key, this.L.steps.length, this.L.steps.length);
     giveXP(50, this.root.querySelector('#lsNext'));
     celebrateBig();
