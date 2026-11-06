@@ -278,6 +278,12 @@ class StudyBuddy {
   // Contextual reactions triggered automatically by app events
   onRoute(kind, arg, sub) {
     this.init();
+    // On a phone the open bubble covers a third of the page, so a new page starts folded (not saved: a tap opens it).
+    if (!this.min && matchMedia('(max-width: 640px)').matches) {
+      clearTimeout(this.foldT);
+      this.min = true;
+      this.el.classList.add('is-min');
+    }
     if (!kind || kind === 'home') {
       this.say("Bentornato <b>Amo</b>!! Oh, you can do it—pick any unit to read or jump onto the 3D bench. Me, <b>Ollie</b>, and <b>Ruby</b> are cheering for you! 🐾💖", { mood: 'happy' });
     } else if (kind === 'lesson') {
